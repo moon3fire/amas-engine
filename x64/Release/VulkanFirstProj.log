@@ -1,0 +1,2 @@
+﻿  main.cpp
+C:\Users\arman\source\repos\VulkanFirstProj\VulkanFirstProj\externals\include\glfw3.h(111,12): fatal  error C1083: Cannot open include file: 'vulkan/vulkan.h': No such file or directory
