@@ -1,2 +1,9 @@
-﻿  lve_pipeline.cpp
+﻿  first_app.cpp
+  lve_device.cpp
+  lve_model.cpp
+  lve_pipeline.cpp
+  lve_swap_chain.cpp
+  lve_window.cpp
+  main.cpp
+  Generating Code...
   VulkanFirstProj.vcxproj -> C:\Users\arman\source\repos\VulkanFirstProj\x64\Debug\VulkanFirstProj.exe
