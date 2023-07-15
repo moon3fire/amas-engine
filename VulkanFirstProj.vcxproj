@@ -143,6 +143,7 @@
     <ClInclude Include="lve_device.hpp" />
     <ClInclude Include="lve_model.hpp" />
     <ClInclude Include="lve_pipeline.hpp" />
+    <ClInclude Include="lve_swap_chain.hpp" />
     <ClInclude Include="lve_window.hpp" />
   </ItemGroup>
   <ItemGroup>

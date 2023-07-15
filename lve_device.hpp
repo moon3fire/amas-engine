@@ -34,7 +34,7 @@ namespace lve {
 		~LveDevice();
 
 		LveDevice(const LveDevice&) = delete;
-		void operator=(const LveDevice&) = delete;
+		LveDevice& operator=(const LveDevice&) = delete;
 		LveDevice(LveDevice&&) = delete;
 		LveDevice& operator=(LveDevice&&) = delete;
 
