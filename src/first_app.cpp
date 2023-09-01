@@ -108,20 +108,20 @@ namespace lve {
         std::shared_ptr<LveModel> lveModel = createCubeModel(lveDevice, {.0f, .0f, .0f});
 
         auto cube = LveGameObject::createGameObject();
-       // auto kubik = LveGameObject::createGameObject();
+        auto kubik = LveGameObject::createGameObject();
 
         cube.model = lveModel;
-       // kubik.model = lveModel;
+        kubik.model = lveModel;
 
         cube.transform.translation = { .0f, .0f, 2.5f };
-       // kubik.transform.translation = { -.3f, .3f, 4.f };
+        kubik.transform.translation = { -.3f, .3f, 4.f };
 
         cube.transform.scale = { .5f, .5f, .5f };
-       // kubik.transform.scale = { .3f, .3f, .3f };
-       // kubik.transform.rotation = { .5f, .4f, 1.f };
+        kubik.transform.scale = { .3f, .3f, .3f };
+        kubik.transform.rotation = { .5f, .4f, 1.f };
 
         gameObjects.push_back(std::move(cube));
-       // gameObjects.push_back(std::move(kubik));
+        gameObjects.push_back(std::move(kubik));
     }
 
 }  // namespace lve
