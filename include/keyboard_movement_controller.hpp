@@ -1,6 +1,5 @@
 #pragma once
 
-// std
 #include "lve_game_object.hpp"
 #include "lve_window.hpp"
 
@@ -24,8 +23,6 @@ namespace lve {
 
 		KeyMappings keys{};
 		float moveSpeed{ 3.f };
-		float turnSpeed{ 1.5f };
-
-	private:
+		float lookSpeed{ 1.5f };
 	};
-} // namespace lve
+}  // namespace lve

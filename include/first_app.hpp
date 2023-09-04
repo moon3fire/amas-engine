@@ -26,7 +26,7 @@ namespace lve {
 	private:
 		void loadGameObjects();
 
-		LveWindow lveWindow{ WIDTH, HEIGHT, "Vulkan engine" };
+		LveWindow lveWindow{ WIDTH, HEIGHT, "Vulkan Tutorial" };
 		LveDevice lveDevice{ lveWindow };
 		LveRenderer lveRenderer{ lveWindow, lveDevice };
 
