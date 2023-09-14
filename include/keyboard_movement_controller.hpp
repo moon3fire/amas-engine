@@ -17,12 +17,13 @@ namespace lve {
 			int lookRight = GLFW_KEY_RIGHT;
 			int lookUp = GLFW_KEY_UP;
 			int lookDown = GLFW_KEY_DOWN;
+			int speedUp = GLFW_KEY_LEFT_SHIFT;
 		};
 
 		void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
 
 		KeyMappings keys{};
-		float moveSpeed{ 3.f };
+		float moveSpeed{ 5.f };
 		float lookSpeed{ 1.5f };
 	};
 }  // namespace lve

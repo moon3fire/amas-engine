@@ -27,6 +27,8 @@ namespace lve {
 		const glm::vec3 upDir{ 0.f, -1.f, 0.f };
 
 		glm::vec3 moveDir{ 0.f };
+		//if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS && glfwGetKey(window, keys.speedUp) == GLFW_PRESS) moveDir += glm::vec3{ 0.f, 0.f, 3.f } *forwardDir;
+		// idea for speed up
 		if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) moveDir += forwardDir;
 		if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS) moveDir -= forwardDir;
 		if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
