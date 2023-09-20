@@ -59,4 +59,20 @@ namespace lve {
 		};
 	}
 
+	LveGameObject LveGameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
+		LveGameObject pointLight = LveGameObject::createGameObject();
+		pointLight.color = color;
+		pointLight.transform.scale.x = radius;
+		pointLight.pointLight = std::make_unique<PointLightComponent>();
+		pointLight.pointLight->lightIntensity = intensity;
+		return pointLight;
+	}
+
+	void LveGameObject::setMaterial(VkSampler sampler, VkImageView vkimage) {
+		this->material = std::make_unique<MaterialComponent>();
+		this->material->textureSampler = sampler;
+		this->material->textureImageView = vkimage;
+		return;
+	}
+
 }  // namespace lve
