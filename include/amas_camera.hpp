@@ -5,9 +5,9 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
-namespace lve {
+namespace amas {
 
-	class LveCamera {
+	class AmasCamera {
 	public:
 		void setOrthographicProjection(
 			float left, float right, float top, float bottom, float near, float far);
@@ -29,4 +29,4 @@ namespace lve {
 		glm::mat4 viewMatrix{ 1.f };
 		glm::mat4 inverseViewMatrix{ 1.f };
 	};
-}  // namespace lve
+}  // namespace amas

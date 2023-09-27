@@ -1,5 +1,4 @@
-
-#include "../include/first_app.hpp"
+#include "../include/app.hpp"
 
 // std
 #include <cstdlib>
@@ -7,7 +6,7 @@
 #include <stdexcept>
 
 int main() {
-	lve::FirstApp app{};
+	amas::App app{};
 
 	try {
 		app.run();

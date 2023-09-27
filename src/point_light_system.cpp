@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <map>
 
-namespace lve {
+namespace amas {
 
 	struct PointLightPushConstants {
 		glm::vec4 position{};
@@ -20,14 +20,14 @@ namespace lve {
 		float radius;
 	};
 
-	PointLightSystem::PointLightSystem(LveDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
-		: lveDevice{ device } {
+	PointLightSystem::PointLightSystem(AmasDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout)
+		: amasDevice{ device } {
 		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
 
 	PointLightSystem::~PointLightSystem() {
-		vkDestroyPipelineLayout(lveDevice.device(), pipelineLayout, nullptr);
+		vkDestroyPipelineLayout(amasDevice.device(), pipelineLayout, nullptr);
 	}
 
 	void PointLightSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
@@ -36,7 +36,7 @@ namespace lve {
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(PointLightPushConstants);
 
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -44,7 +44,7 @@ namespace lve {
 		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-		if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
+		if (vkCreatePipelineLayout(amasDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) !=
 			VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
@@ -54,14 +54,14 @@ namespace lve {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
-		LvePipeline::defaultPipelineConfigInfo(pipelineConfig);
-		LvePipeline::enableAlphaBlending(pipelineConfig);
+		AmasPipeline::defaultPipelineConfigInfo(pipelineConfig);
+		AmasPipeline::enableAlphaBlending(pipelineConfig);
 		pipelineConfig.attributeDescriptions.clear();
 		pipelineConfig.bindingDescriptions.clear();
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		lvePipeline = std::make_unique<LvePipeline>(
-			lveDevice,
+		amasPipeline = std::make_unique<AmasPipeline>(
+			amasDevice,
 			"shaders/point_light.vert.spv",
 			"shaders/point_light.frag.spv",
 			pipelineConfig);
@@ -102,11 +102,11 @@ namespace lve {
 
 				startTime = currentTime;
 			}
-		
+
 
 			obj.transform.translation += glm::vec3(0.f, -.0005f, 0.f);
 		*/
-			//copy light to the ubo
+		//copy light to the ubo
 			ubo.pointLights[lightIndex].position = glm::vec4(obj.transform.translation, 1.f);
 			ubo.pointLights[lightIndex].color = glm::vec4(obj.color, obj.pointLight->lightIntensity);
 
@@ -117,7 +117,7 @@ namespace lve {
 
 	void PointLightSystem::render(FrameInfo& frameInfo) {
 		//sort lights
-		std::map<float, LveGameObject::id_t> sorted;
+		std::map<float, AmasGameObject::id_t> sorted;
 
 		for (auto& kv : frameInfo.gameObjects) {
 			auto& obj = kv.second;
@@ -130,7 +130,7 @@ namespace lve {
 		}
 
 
-		lvePipeline->bind(frameInfo.commandBuffer);
+		amasPipeline->bind(frameInfo.commandBuffer);
 
 		vkCmdBindDescriptorSets(
 			frameInfo.commandBuffer,
@@ -163,4 +163,4 @@ namespace lve {
 			vkCmdDraw(frameInfo.commandBuffer, 6, 1, 0, 0);
 		}
 	}
-}  // namespace lve
+}  // namespace amas

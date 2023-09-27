@@ -1,6 +1,5 @@
-#include "../include/lve_pipeline.hpp"
-
-#include "../include/lve_model.hpp"
+#include "../include/amas_pipeline.hpp"
+#include "../include/amas_model.hpp"
 
 // std
 #include <cassert>
@@ -8,24 +7,24 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace lve {
+namespace amas {
 
-	LvePipeline::LvePipeline(
-		LveDevice& device,
+	AmasPipeline::AmasPipeline(
+		AmasDevice& device,
 		const std::string& vertFilepath,
 		const std::string& fragFilepath,
 		const PipelineConfigInfo& configInfo)
-		: lveDevice{ device } {
+		: amasDevice{ device } {
 		createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
 	}
 
-	LvePipeline::~LvePipeline() {
-		vkDestroyShaderModule(lveDevice.device(), vertShaderModule, nullptr);
-		vkDestroyShaderModule(lveDevice.device(), fragShaderModule, nullptr);
-		vkDestroyPipeline(lveDevice.device(), graphicsPipeline, nullptr);
+	AmasPipeline::~AmasPipeline() {
+		vkDestroyShaderModule(amasDevice.device(), vertShaderModule, nullptr);
+		vkDestroyShaderModule(amasDevice.device(), fragShaderModule, nullptr);
+		vkDestroyPipeline(amasDevice.device(), graphicsPipeline, nullptr);
 	}
 
-	std::vector<char> LvePipeline::readFile(const std::string& filepath) {
+	std::vector<char> AmasPipeline::readFile(const std::string& filepath) {
 		std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
 
 		if (!file.is_open()) {
@@ -42,7 +41,7 @@ namespace lve {
 		return buffer;
 	}
 
-	void LvePipeline::createGraphicsPipeline(
+	void AmasPipeline::createGraphicsPipeline(
 		const std::string& vertFilepath,
 		const std::string& fragFilepath,
 		const PipelineConfigInfo& configInfo) {
@@ -106,7 +105,7 @@ namespace lve {
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
 		if (vkCreateGraphicsPipelines(
-			lveDevice.device(),
+			amasDevice.device(),
 			VK_NULL_HANDLE,
 			1,
 			&pipelineInfo,
@@ -116,22 +115,22 @@ namespace lve {
 		}
 	}
 
-	void LvePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
+	void AmasPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		createInfo.codeSize = code.size();
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-		if (vkCreateShaderModule(lveDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+		if (vkCreateShaderModule(amasDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create shader module");
 		}
 	}
 
-	void LvePipeline::bind(VkCommandBuffer commandBuffer) {
+	void AmasPipeline::bind(VkCommandBuffer commandBuffer) {
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
+	void AmasPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
@@ -201,11 +200,11 @@ namespace lve {
 			static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 		configInfo.dynamicStateInfo.flags = 0;
 
-		configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
-		configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
+		configInfo.bindingDescriptions = AmasModel::Vertex::getBindingDescriptions();
+		configInfo.attributeDescriptions = AmasModel::Vertex::getAttributeDescriptions();
 	}
 
-	void LvePipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {
+	void AmasPipeline::enableAlphaBlending(PipelineConfigInfo& configInfo) {
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 
 		configInfo.colorBlendAttachment.colorWriteMask =
@@ -213,10 +212,10 @@ namespace lve {
 			VK_COLOR_COMPONENT_A_BIT;
 		configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;              
+		configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
 		configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
 		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 		configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 	}
 
-}  // namespace lve
+}  // namespace amas

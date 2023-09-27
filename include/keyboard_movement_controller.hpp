@@ -1,9 +1,9 @@
 #pragma once
 
-#include "lve_game_object.hpp"
-#include "lve_window.hpp"
+#include "amas_game_object.hpp"
+#include "amas_window.hpp"
 
-namespace lve {
+namespace amas {
 	class KeyboardMovementController {
 	public:
 		struct KeyMappings {
@@ -20,10 +20,10 @@ namespace lve {
 			int speedUp = GLFW_KEY_LEFT_SHIFT;
 		};
 
-		void moveInPlaneXZ(GLFWwindow* window, float dt, LveGameObject& gameObject);
+		void moveInPlaneXZ(GLFWwindow* window, float dt, AmasGameObject& gameObject);
 
 		KeyMappings keys{};
 		float moveSpeed{ 5.f };
 		float lookSpeed{ 1.5f };
 	};
-}  // namespace lve
+}  // namespace amas

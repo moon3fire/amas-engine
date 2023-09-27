@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lve_camera.hpp"
-#include "lve_game_object.hpp"
+#include "amas_camera.hpp"
+#include "amas_game_object.hpp"
 
 // lib
 #include <vulkan/vulkan.h>
 
-namespace lve {
+namespace amas {
 
 	constexpr int MAX_LIGHTS = 10;
 
@@ -28,9 +28,9 @@ namespace lve {
 		int frameIndex;
 		float frameTime;
 		VkCommandBuffer commandBuffer;
-		LveCamera& camera;
+		AmasCamera& camera;
 		VkDescriptorSet globalDescriptorSet;
-		LveGameObject::Map& gameObjects;
+		AmasGameObject::Map& gameObjects;
 	};
 
-} // namespace lve
+} // namespace amas

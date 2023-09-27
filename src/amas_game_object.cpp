@@ -1,6 +1,8 @@
-#include "../include/lve_game_object.hpp"
+#include "../include/amas_game_object.hpp"
 
-namespace lve {
+namespace amas {
+
+	AmasDevice* AmasGameObject::device = nullptr;
 
 	glm::mat4 TransformComponent::mat4() {
 		const float c3 = glm::cos(rotation.z);
@@ -59,8 +61,13 @@ namespace lve {
 		};
 	}
 
-	LveGameObject LveGameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
-		LveGameObject pointLight = LveGameObject::createGameObject();
+
+	void AmasGameObject::setDevice(AmasDevice& device_) {
+		device = &device_;
+	}
+
+	AmasGameObject AmasGameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
+		AmasGameObject pointLight = AmasGameObject::createGameObject();
 		pointLight.color = color;
 		pointLight.transform.scale.x = radius;
 		pointLight.pointLight = std::make_unique<PointLightComponent>();
@@ -68,11 +75,12 @@ namespace lve {
 		return pointLight;
 	}
 
-	void LveGameObject::setMaterial(VkSampler sampler, VkImageView vkimage) {
-		this->material = std::make_unique<MaterialComponent>();
-		this->material->textureSampler = sampler;
-		this->material->textureImageView = vkimage;
-		return;
+	void AmasGameObject::attachMaterial(std::shared_ptr<AmasTexture> AmasTexture) {
+		material = std::make_unique<MaterialComponent>();
+		material->AmasTexture = AmasTexture;
+		material->info.imageLayout = AmasTexture->getImageLayout();
+		material->info.imageView = AmasTexture->getImageView();
+		material->info.sampler = AmasTexture->getSampler();
 	}
 
-}  // namespace lve
+}  // namespace amas

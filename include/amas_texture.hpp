@@ -1,18 +1,18 @@
 #pragma once
 #include <vulkan/vulkan_core.h>
-#include "lve_device.hpp"
+#include "amas_device.hpp"
 #include <string>
 
-namespace lve {
-	class Texture {
+namespace amas {
+	class AmasTexture {
 	public:
-		Texture(LveDevice& device, const std::string &filepath);
-		Texture(const Texture&) = delete;
-		Texture& operator=(const Texture&) = delete;
-		Texture(Texture&&) = delete;
-		Texture& operator=(Texture&&) = delete;
+		AmasTexture(AmasDevice& device, const std::string& filepath);
+		AmasTexture(const AmasTexture&) = delete;
+		AmasTexture& operator=(const AmasTexture&) = delete;
+		AmasTexture(AmasTexture&&) = delete;
+		AmasTexture& operator=(AmasTexture&&) = delete;
 
-		~Texture();
+		~AmasTexture();
 
 		VkSampler getSampler() { return sampler; }
 		VkImageView getImageView() { return imageView; }
@@ -23,7 +23,7 @@ namespace lve {
 		void generateMinmaps();
 
 		int width, height, mipLevels;
-		LveDevice& lveDevice;
+		AmasDevice& amasDevice;
 		VkImage image;
 		VkDeviceMemory imageMemory;
 		VkImageView imageView;
@@ -33,4 +33,4 @@ namespace lve {
 
 	};
 
-} // namespace lve
+} // namespace amas

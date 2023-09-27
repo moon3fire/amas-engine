@@ -4,15 +4,15 @@
 #include "../externals/include/glfw3.h"
 
 #include <string>
-namespace lve {
+namespace amas {
 
-	class LveWindow {
+	class AmasWindow {
 	public:
-		LveWindow(int w, int h, std::string name);
-		~LveWindow();
+		AmasWindow(int w, int h, std::string name);
+		~AmasWindow();
 
-		LveWindow(const LveWindow&) = delete;
-		LveWindow& operator=(const LveWindow&) = delete;
+		AmasWindow(const AmasWindow&) = delete;
+		AmasWindow& operator=(const AmasWindow&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(window); }
 		VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height) }; }
@@ -33,4 +33,4 @@ namespace lve {
 		std::string windowName;
 		GLFWwindow* window;
 	};
-}  // namespace lve
+}  // namespace amas

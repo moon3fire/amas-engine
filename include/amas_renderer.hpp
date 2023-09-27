@@ -1,25 +1,25 @@
 #pragma once
 
-#include "lve_device.hpp"
-#include "lve_swap_chain.hpp"
-#include "lve_window.hpp"
+#include "amas_device.hpp"
+#include "amas_swap_chain.hpp"
+#include "amas_window.hpp"
 
 // std
 #include <cassert>
 #include <memory>
 #include <vector>
 
-namespace lve {
-	class LveRenderer {
+namespace amas {
+	class AmasRenderer {
 	public:
-		LveRenderer(LveWindow& window, LveDevice& device);
-		~LveRenderer();
+		AmasRenderer(AmasWindow& window, AmasDevice& device);
+		~AmasRenderer();
 
-		LveRenderer(const LveRenderer&) = delete;
-		LveRenderer& operator=(const LveRenderer&) = delete;
+		AmasRenderer(const AmasRenderer&) = delete;
+		AmasRenderer& operator=(const AmasRenderer&) = delete;
 
-		VkRenderPass getSwapChainRenderPass() const { return lveSwapChain->getRenderPass(); }
-		float getAspectRatio() const { return lveSwapChain->extentAspectRatio(); }
+		VkRenderPass getSwapChainRenderPass() const { return amasSwapChain->getRenderPass(); }
+		float getAspectRatio() const { return amasSwapChain->extentAspectRatio(); }
 		bool isFrameInProgress() const { return isFrameStarted; }
 
 		VkCommandBuffer getCurrentCommandBuffer() const {
@@ -42,13 +42,13 @@ namespace lve {
 		void freeCommandBuffers();
 		void recreateSwapChain();
 
-		LveWindow& lveWindow;
-		LveDevice& lveDevice;
-		std::unique_ptr<LveSwapChain> lveSwapChain;
+		AmasWindow& amasWindow;
+		AmasDevice& amasDevice;
+		std::unique_ptr<AmasSwapChain> amasSwapChain;
 		std::vector<VkCommandBuffer> commandBuffers;
 
 		uint32_t currentImageIndex;
 		int currentFrameIndex{ 0 };
 		bool isFrameStarted{ false };
 	};
-}  // namespace lve
+}  // namespace amas

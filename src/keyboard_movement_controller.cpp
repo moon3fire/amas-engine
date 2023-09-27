@@ -3,10 +3,10 @@
 // std
 #include <limits>
 
-namespace lve {
+namespace amas {
 
 	void KeyboardMovementController::moveInPlaneXZ(
-		GLFWwindow* window, float dt, LveGameObject& gameObject) {
+		GLFWwindow* window, float dt, AmasGameObject& gameObject) {
 		glm::vec3 rotate{ 0 };
 		if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
 		if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
@@ -40,4 +40,4 @@ namespace lve {
 			gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
 		}
 	}
-}  // namespace lve
+}  // namespace amas

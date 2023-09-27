@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lve_device.hpp"
+#include "amas_device.hpp"
 
 // std
 #include <string>
 #include <vector>
 
-namespace lve {
+namespace amas {
 
 	struct PipelineConfigInfo {
 		PipelineConfigInfo() = default;
@@ -29,17 +29,17 @@ namespace lve {
 		uint32_t subpass = 0;
 	};
 
-	class LvePipeline {
+	class AmasPipeline {
 	public:
-		LvePipeline(
-			LveDevice& device,
+		AmasPipeline(
+			AmasDevice& device,
 			const std::string& vertFilepath,
 			const std::string& fragFilepath,
 			const PipelineConfigInfo& configInfo);
-		~LvePipeline();
+		~AmasPipeline();
 
-		LvePipeline(const LvePipeline&) = delete;
-		LvePipeline& operator=(const LvePipeline&) = delete;
+		AmasPipeline(const AmasPipeline&) = delete;
+		AmasPipeline& operator=(const AmasPipeline&) = delete;
 
 		void bind(VkCommandBuffer commandBuffer);
 
@@ -56,9 +56,9 @@ namespace lve {
 
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 
-		LveDevice& lveDevice;
+		AmasDevice& amasDevice;
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;
 	};
-}  // namespace lve
+}  // namespace amas

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lve_device.hpp"
+#include "amas_device.hpp"
 
 // vulkan headers
 #include <vulkan/vulkan.h>
@@ -10,20 +10,20 @@
 #include <string>
 #include <vector>
 
-namespace lve {
+namespace amas {
 
-	class LveSwapChain {
+	class AmasSwapChain {
 	public:
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-		LveSwapChain(LveDevice& deviceRef, VkExtent2D windowExtent);
-		LveSwapChain(
-			LveDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<LveSwapChain> previous);
+		AmasSwapChain(AmasDevice& deviceRef, VkExtent2D windowExtent);
+		AmasSwapChain(
+			AmasDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<AmasSwapChain> previous);
 
-		~LveSwapChain();
+		~AmasSwapChain();
 
-		LveSwapChain(const LveSwapChain&) = delete;
-		LveSwapChain& operator=(const LveSwapChain&) = delete;
+		AmasSwapChain(const AmasSwapChain&) = delete;
+		AmasSwapChain& operator=(const AmasSwapChain&) = delete;
 
 		VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
 		VkRenderPass getRenderPass() { return renderPass; }
@@ -42,7 +42,7 @@ namespace lve {
 		VkResult acquireNextImage(uint32_t* imageIndex);
 		VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
-		bool compareSwapFormats(const LveSwapChain& swapChain) const {
+		bool compareSwapFormats(const AmasSwapChain& swapChain) const {
 			return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
 				swapChain.swapChainImageFormat == swapChainImageFormat;
 		}
@@ -76,11 +76,11 @@ namespace lve {
 		std::vector<VkImage> swapChainImages;
 		std::vector<VkImageView> swapChainImageViews;
 
-		LveDevice& device;
+		AmasDevice& device;
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain;
-		std::shared_ptr<LveSwapChain> oldSwapChain;
+		std::shared_ptr<AmasSwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -89,4 +89,4 @@ namespace lve {
 		size_t currentFrame = 0;
 	};
 
-}  // namespace lve
+}  // namespace amas

@@ -1,20 +1,20 @@
 #pragma once
 
-#include "lve_camera.hpp"
-#include "lve_device.hpp"
-#include "lve_game_object.hpp"
-#include "lve_pipeline.hpp"
-#include "lve_frame_info.hpp"
+#include "amas_camera.hpp"
+#include "amas_device.hpp"
+#include "amas_game_object.hpp"
+#include "amas_pipeline.hpp"
+#include "amas_frame_info.hpp"
 
 // std
 #include <memory>
 #include <vector>
 #include <chrono>
 
-namespace lve {
+namespace amas {
 	class PointLightSystem {
 	public:
-		PointLightSystem(LveDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
+		PointLightSystem(AmasDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~PointLightSystem();
 
 		PointLightSystem(const PointLightSystem&) = delete;
@@ -27,13 +27,13 @@ namespace lve {
 		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 
-		LveDevice& lveDevice;
+		AmasDevice& amasDevice;
 
-		std::unique_ptr<LvePipeline> lvePipeline;
+		std::unique_ptr<AmasPipeline> amasPipeline;
 		VkPipelineLayout pipelineLayout;
 
 		//my variables
 		std::chrono::steady_clock::time_point startTime;
 		bool firstTime{ true };
 	};
-}  // namespace lve
+}  // namespace amas

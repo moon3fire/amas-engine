@@ -1,33 +1,33 @@
 #pragma once
 
-#include "lve_camera.hpp"
-#include "lve_device.hpp"
-#include "lve_game_object.hpp"
-#include "lve_pipeline.hpp"
-#include "lve_frame_info.hpp"
+#include "amas_camera.hpp"
+#include "amas_device.hpp"
+#include "amas_game_object.hpp"
+#include "amas_pipeline.hpp"
+#include "amas_frame_info.hpp"
 
 // std
 #include <memory>
 #include <vector>
 
-namespace lve {
-class SimpleRenderSystem {
- public:
-  SimpleRenderSystem(LveDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
-  ~SimpleRenderSystem();
+namespace amas {
+	class SimpleRenderSystem {
+	public:
+		SimpleRenderSystem(AmasDevice& device, VkRenderPass renderPass, const std::vector<std::unique_ptr<AmasDescriptorSetLayout>>& layouts);
+		~SimpleRenderSystem();
 
-  SimpleRenderSystem(const SimpleRenderSystem &) = delete;
-  SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
+		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
+		SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-  void renderGameObjects(FrameInfo& frameInfo);
+		void renderGameObjects(FrameInfo& frameInfo, std::vector<VkDescriptorSet>& componentSets, std::vector<std::unique_ptr<AmasBuffer>>& componentUboBuffers);
 
- private:
-  void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
-  void createPipeline(VkRenderPass renderPass);
+	private:
+		void createPipelineLayout(const std::vector<std::unique_ptr<AmasDescriptorSetLayout>>& layouts);
+		void createPipeline(VkRenderPass& renderPass);
 
-  LveDevice &lveDevice;
+		AmasDevice& amasDevice;
 
-  std::unique_ptr<LvePipeline> lvePipeline;
-  VkPipelineLayout pipelineLayout;
-};
-}  // namespace lve
+		std::unique_ptr<AmasPipeline> amasPipeline;
+		VkPipelineLayout pipelineLayout;
+	};
+}  // namespace amas

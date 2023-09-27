@@ -1,12 +1,12 @@
 #pragma once
 
-#include "lve_window.hpp"
+#include "amas_window.hpp"
 
 // std lib headers
 #include <string>
 #include <vector>
 
-namespace lve {
+namespace amas {
 
 	struct SwapChainSupportDetails {
 		VkSurfaceCapabilitiesKHR capabilities;
@@ -22,7 +22,7 @@ namespace lve {
 		bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 	};
 
-	class LveDevice {
+	class AmasDevice {
 	public:
 #ifdef NDEBUG
 		const bool enableValidationLayers = false;
@@ -30,14 +30,14 @@ namespace lve {
 		const bool enableValidationLayers = true;
 #endif
 
-		LveDevice(LveWindow& window);
-		~LveDevice();
+		AmasDevice(AmasWindow& window);
+		~AmasDevice();
 
 		// Not copyable or movable
-		LveDevice(const LveDevice&) = delete;
-		LveDevice& operator=(const LveDevice&) = delete;
-		LveDevice(LveDevice&&) = delete;
-		LveDevice& operator=(LveDevice&&) = delete;
+		AmasDevice(const AmasDevice&) = delete;
+		AmasDevice& operator=(const AmasDevice&) = delete;
+		AmasDevice(AmasDevice&&) = delete;
+		AmasDevice& operator=(AmasDevice&&) = delete;
 
 		VkCommandPool getCommandPool() { return commandPool; }
 		VkDevice device() { return device_; }
@@ -94,7 +94,7 @@ namespace lve {
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-		LveWindow& window;
+		AmasWindow& window;
 		VkCommandPool commandPool;
 
 		VkDevice device_;
@@ -106,4 +106,4 @@ namespace lve {
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	};
 
-}  // namespace lve
+}  // namespace amas

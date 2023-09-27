@@ -1,13 +1,13 @@
-#include "../include/lve_texture.hpp"
-#include "../include/lve_buffer.hpp"
+#include "../include/amas_texture.hpp"
+#include "../include/amas_buffer.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../externals/include/stb_image.h"
 #include <stdexcept>
 #include <cmath>
 
-namespace lve {
-	Texture::Texture(LveDevice& device, const std::string& filepath) :lveDevice{ device } {
+namespace amas {
+	AmasTexture::AmasTexture(AmasDevice& device, const std::string& filepath) :amasDevice{ device } {
 		int channels;
 		int bytesPerPixel;
 
@@ -15,8 +15,8 @@ namespace lve {
 
 		mipLevels = std::floor(std::log2(std::max(width, height))) + 1;
 
-		LveBuffer stagingBuffer(
-			lveDevice,
+		AmasBuffer stagingBuffer(
+			amasDevice,
 			4,
 			static_cast<uint32_t>(width * height),
 			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -41,11 +41,11 @@ namespace lve {
 		imageInfo.extent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height), 1 };
 		imageInfo.usage = VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-		lveDevice.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
+		amasDevice.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, imageMemory);
 
 		transitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-		lveDevice.copyBufferToImage(stagingBuffer.getBuffer(),
+		amasDevice.copyBufferToImage(stagingBuffer.getBuffer(),
 			image,
 			static_cast<uint32_t>(width),
 			static_cast<uint32_t>(height),
@@ -74,8 +74,8 @@ namespace lve {
 		samplerInfo.anisotropyEnable = VK_TRUE;
 		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-		vkCreateSampler(lveDevice.device(), &samplerInfo, nullptr, &sampler);
-		
+		vkCreateSampler(amasDevice.device(), &samplerInfo, nullptr, &sampler);
+
 		VkImageViewCreateInfo imageViewInfo{};
 		imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 		imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
@@ -91,20 +91,20 @@ namespace lve {
 		imageViewInfo.subresourceRange.levelCount = mipLevels;
 		imageViewInfo.image = image;
 
-		vkCreateImageView(lveDevice.device(), &imageViewInfo, nullptr, &imageView);
+		vkCreateImageView(amasDevice.device(), &imageViewInfo, nullptr, &imageView);
 
 		stbi_image_free(data);
 	}
-	
-	Texture::~Texture() {
-		vkDestroyImage(lveDevice.device(), image, nullptr);
-		vkFreeMemory(lveDevice.device(), imageMemory, nullptr);
-		vkDestroyImageView(lveDevice.device(), imageView, nullptr);
-		vkDestroySampler(lveDevice.device(), sampler, nullptr);
+
+	AmasTexture::~AmasTexture() {
+		vkDestroyImage(amasDevice.device(), image, nullptr);
+		vkFreeMemory(amasDevice.device(), imageMemory, nullptr);
+		vkDestroyImageView(amasDevice.device(), imageView, nullptr);
+		vkDestroySampler(amasDevice.device(), sampler, nullptr);
 	}
 
-	void Texture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout) {
-		VkCommandBuffer commandBuffer = lveDevice.beginSingleTimeCommands();
+	void AmasTexture::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout) {
+		VkCommandBuffer commandBuffer = amasDevice.beginSingleTimeCommands();
 
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -128,7 +128,8 @@ namespace lve {
 
 			sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 			destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-		} else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		}
+		else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
@@ -141,18 +142,18 @@ namespace lve {
 
 		vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-		lveDevice.endSingleTimeCommands(commandBuffer);
+		amasDevice.endSingleTimeCommands(commandBuffer);
 	}
 
-	void Texture::generateMinmaps() {
+	void AmasTexture::generateMinmaps() {
 		VkFormatProperties formatProperties;
-		vkGetPhysicalDeviceFormatProperties(lveDevice.getPhysicalDevice(), imageFormat, &formatProperties);
+		vkGetPhysicalDeviceFormatProperties(amasDevice.getPhysicalDevice(), imageFormat, &formatProperties);
 
 		if (!(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT)) {
-			throw std::runtime_error("texture image format does not support linear blitting");
+			throw std::runtime_error("AmasTexture image format does not support linear blitting");
 		}
 
-		VkCommandBuffer commandBuffer = lveDevice.beginSingleTimeCommands();
+		VkCommandBuffer commandBuffer = amasDevice.beginSingleTimeCommands();
 
 		VkImageMemoryBarrier barrier{};
 		barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -164,7 +165,7 @@ namespace lve {
 		barrier.subresourceRange.levelCount = 1;
 		barrier.subresourceRange.baseArrayLayer = 0;
 		barrier.subresourceRange.layerCount = 1;
-		
+
 		int32_t mipWidth = width;
 		int32_t mipHeight = height;
 
@@ -192,12 +193,12 @@ namespace lve {
 			blit.dstSubresource.layerCount = 1;
 
 			vkCmdBlitImage(commandBuffer,
-						   image,
-						   VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-						   image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-						   1,
-						   &blit,
-						   VK_FILTER_LINEAR);
+				image,
+				VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+				image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+				1,
+				&blit,
+				VK_FILTER_LINEAR);
 
 			barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
 			barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -205,9 +206,9 @@ namespace lve {
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
 			vkCmdPipelineBarrier(commandBuffer,
-								 VK_PIPELINE_STAGE_TRANSFER_BIT,
-								 VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-								 0, 0, nullptr, 0, nullptr, 1, &barrier);
+				VK_PIPELINE_STAGE_TRANSFER_BIT,
+				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+				0, 0, nullptr, 0, nullptr, 1, &barrier);
 
 			if (mipWidth > 1) mipWidth /= 2;
 			if (mipHeight > 1) mipHeight /= 2;
@@ -224,7 +225,7 @@ namespace lve {
 			VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 			0, 0, nullptr, 0, nullptr, 1, &barrier);
 
-		lveDevice.endSingleTimeCommands(commandBuffer);
+		amasDevice.endSingleTimeCommands(commandBuffer);
 	}
 
-} // namespace lve
+} // namespace amas

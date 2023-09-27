@@ -1,69 +1,69 @@
-#include "../include/lve_renderer.hpp"
+#include "../include/amas_renderer.hpp"
 
 // std
 #include <array>
 #include <cassert>
 #include <stdexcept>
 
-namespace lve {
+namespace amas {
 
-	LveRenderer::LveRenderer(LveWindow& window, LveDevice& device)
-		: lveWindow{ window }, lveDevice{ device } {
+	AmasRenderer::AmasRenderer(AmasWindow& window, AmasDevice& device)
+		: amasWindow{ window }, amasDevice{ device } {
 		recreateSwapChain();
 		createCommandBuffers();
 	}
 
-	LveRenderer::~LveRenderer() { freeCommandBuffers(); }
+	AmasRenderer::~AmasRenderer() { freeCommandBuffers(); }
 
-	void LveRenderer::recreateSwapChain() {
-		auto extent = lveWindow.getExtent();
+	void AmasRenderer::recreateSwapChain() {
+		auto extent = amasWindow.getExtent();
 		while (extent.width == 0 || extent.height == 0) {
-			extent = lveWindow.getExtent();
+			extent = amasWindow.getExtent();
 			glfwWaitEvents();
 		}
-		vkDeviceWaitIdle(lveDevice.device());
+		vkDeviceWaitIdle(amasDevice.device());
 
-		if (lveSwapChain == nullptr) {
-			lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent);
+		if (amasSwapChain == nullptr) {
+			amasSwapChain = std::make_unique<AmasSwapChain>(amasDevice, extent);
 		}
 		else {
-			std::shared_ptr<LveSwapChain> oldSwapChain = std::move(lveSwapChain);
-			lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain);
+			std::shared_ptr<AmasSwapChain> oldSwapChain = std::move(amasSwapChain);
+			amasSwapChain = std::make_unique<AmasSwapChain>(amasDevice, extent, oldSwapChain);
 
-			if (!oldSwapChain->compareSwapFormats(*lveSwapChain.get())) {
+			if (!oldSwapChain->compareSwapFormats(*amasSwapChain.get())) {
 				throw std::runtime_error("Swap chain image(or depth) format has changed!");
 			}
 		}
 	}
 
-	void LveRenderer::createCommandBuffers() {
-		commandBuffers.resize(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
+	void AmasRenderer::createCommandBuffers() {
+		commandBuffers.resize(AmasSwapChain::MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		allocInfo.commandPool = lveDevice.getCommandPool();
+		allocInfo.commandPool = amasDevice.getCommandPool();
 		allocInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-		if (vkAllocateCommandBuffers(lveDevice.device(), &allocInfo, commandBuffers.data()) !=
+		if (vkAllocateCommandBuffers(amasDevice.device(), &allocInfo, commandBuffers.data()) !=
 			VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate command buffers!");
 		}
 	}
 
-	void LveRenderer::freeCommandBuffers() {
+	void AmasRenderer::freeCommandBuffers() {
 		vkFreeCommandBuffers(
-			lveDevice.device(),
-			lveDevice.getCommandPool(),
+			amasDevice.device(),
+			amasDevice.getCommandPool(),
 			static_cast<uint32_t>(commandBuffers.size()),
 			commandBuffers.data());
 		commandBuffers.clear();
 	}
 
-	VkCommandBuffer LveRenderer::beginFrame() {
+	VkCommandBuffer AmasRenderer::beginFrame() {
 		assert(!isFrameStarted && "Can't call beginFrame while already in progress");
 
-		auto result = lveSwapChain->acquireNextImage(&currentImageIndex);
+		auto result = amasSwapChain->acquireNextImage(&currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			recreateSwapChain();
 			return nullptr;
@@ -85,17 +85,17 @@ namespace lve {
 		return commandBuffer;
 	}
 
-	void LveRenderer::endFrame() {
+	void AmasRenderer::endFrame() {
 		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 		auto commandBuffer = getCurrentCommandBuffer();
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 			throw std::runtime_error("failed to record command buffer!");
 		}
 
-		auto result = lveSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
+		auto result = amasSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-			lveWindow.wasWindowResized()) {
-			lveWindow.resetWindowResizedFlag();
+			amasWindow.wasWindowResized()) {
+			amasWindow.resetWindowResizedFlag();
 			recreateSwapChain();
 		}
 		else if (result != VK_SUCCESS) {
@@ -103,10 +103,10 @@ namespace lve {
 		}
 
 		isFrameStarted = false;
-		currentFrameIndex = (currentFrameIndex + 1) % LveSwapChain::MAX_FRAMES_IN_FLIGHT;
+		currentFrameIndex = (currentFrameIndex + 1) % AmasSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 
-	void LveRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+	void AmasRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
 		assert(
 			commandBuffer == getCurrentCommandBuffer() &&
@@ -114,11 +114,11 @@ namespace lve {
 
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = lveSwapChain->getRenderPass();
-		renderPassInfo.framebuffer = lveSwapChain->getFrameBuffer(currentImageIndex);
+		renderPassInfo.renderPass = amasSwapChain->getRenderPass();
+		renderPassInfo.framebuffer = amasSwapChain->getFrameBuffer(currentImageIndex);
 
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = lveSwapChain->getSwapChainExtent();
+		renderPassInfo.renderArea.extent = amasSwapChain->getSwapChainExtent();
 
 		std::array<VkClearValue, 2> clearValues{};
 		clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
@@ -131,16 +131,16 @@ namespace lve {
 		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(lveSwapChain->getSwapChainExtent().width);
-		viewport.height = static_cast<float>(lveSwapChain->getSwapChainExtent().height);
+		viewport.width = static_cast<float>(amasSwapChain->getSwapChainExtent().width);
+		viewport.height = static_cast<float>(amasSwapChain->getSwapChainExtent().height);
 		viewport.minDepth = 0.0f;
 		viewport.maxDepth = 1.0f;
-		VkRect2D scissor{ {0, 0}, lveSwapChain->getSwapChainExtent() };
+		VkRect2D scissor{ {0, 0}, amasSwapChain->getSwapChainExtent() };
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	}
 
-	void LveRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
+	void AmasRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
 		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
 		assert(
 			commandBuffer == getCurrentCommandBuffer() &&
@@ -148,4 +148,4 @@ namespace lve {
 		vkCmdEndRenderPass(commandBuffer);
 	}
 
-}  // namespace lve
+}  // namespace amas

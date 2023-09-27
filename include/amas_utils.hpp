@@ -2,7 +2,7 @@
 
 #include <functional>
 
-namespace lve {
+namespace amas {
 
 	template <typename T, typename... Rest>
 	void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
@@ -10,4 +10,4 @@ namespace lve {
 		(hashCombine(seed, rest), ...);
 	};
 
-}  // namespace lve
+}  // namespace amas

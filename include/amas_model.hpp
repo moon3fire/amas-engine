@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lve_device.hpp"
-#include "lve_buffer.hpp"
+#include "amas_device.hpp"
+#include "amas_buffer.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -12,8 +12,8 @@
 #include <memory>
 #include <vector>
 
-namespace lve {
-	class LveModel {
+namespace amas {
+	class AmasModel {
 	public:
 		struct Vertex {
 			glm::vec3 position{};
@@ -37,14 +37,14 @@ namespace lve {
 			void loadModel(const std::string& filepath);
 		};
 
-		LveModel(LveDevice& device, const LveModel::Builder& builder);
-		~LveModel();
+		AmasModel(AmasDevice& device, const AmasModel::Builder& builder);
+		~AmasModel();
 
-		LveModel(const LveModel&) = delete;
-		LveModel& operator=(const LveModel&) = delete;
+		AmasModel(const AmasModel&) = delete;
+		AmasModel& operator=(const AmasModel&) = delete;
 
-		static std::unique_ptr<LveModel> createModelFromFile(
-			LveDevice& device, const std::string& filepath);
+		static std::unique_ptr<AmasModel> createModelFromFile(
+			AmasDevice& device, const std::string& filepath);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
@@ -53,13 +53,13 @@ namespace lve {
 		void createVertexBuffers(const std::vector<Vertex>& vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& indices);
 
-		LveDevice& lveDevice;
+		AmasDevice& amasDevice;
 
-		std::unique_ptr<LveBuffer> vertexBuffer;
+		std::unique_ptr<AmasBuffer> vertexBuffer;
 		uint32_t vertexCount;
 
 		bool hasIndexBuffer = false;
-		std::unique_ptr<LveBuffer> indexBuffer;
+		std::unique_ptr<AmasBuffer> indexBuffer;
 		uint32_t indexCount;
 	};
-}  // namespace lve
+}  // namespace amas
