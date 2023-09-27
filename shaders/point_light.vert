@@ -25,6 +25,10 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     int activeLightsCount;
 } ubo;
 
+layout(set = 1, binding = 0) uniform ComponentUbo {
+    int currentGameObjectID;
+} componentUbo;
+
 layout (push_constant) uniform Push {
     vec4 position;
     vec4 color;

@@ -24,6 +24,10 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     int activeLightsCount;
 } ubo;
 
+layout(set = 1, binding = 0) uniform ComponentUbo {
+    int currentGameObjectID;
+} componentUbo;
+
 layout (push_constant) uniform Push {
 	mat4 modelMatrix;
 	mat4 normalMatrix;
