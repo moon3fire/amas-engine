@@ -2,6 +2,7 @@
 
 #include "amas_game_object.hpp"
 #include "amas_window.hpp"
+#include "amas_camera.hpp"
 
 namespace amas {
 	class KeyboardMovementController {
@@ -21,7 +22,7 @@ namespace amas {
 		};
 
 		void moveInPlaneXZ(GLFWwindow* window, float dt, AmasGameObject& gameObject);
-
+		
 		KeyMappings keys{};
 		float moveSpeed{ 5.f };
 		float lookSpeed{ 1.5f };

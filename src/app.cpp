@@ -28,7 +28,7 @@ namespace amas {
 
 	App::App() {
 		loadGameObjects();
-		initDescriptorPool(getMaterialHavingObjectsCount(), textures.size());
+		initDescriptorPool(getMaterialHavingObjectsCount(), (int)textures.size());
 	}
 
 	App::~App() {}
@@ -45,7 +45,7 @@ namespace amas {
 
 	void App::initDescriptorPool(int materialObjectsCount, int texturesCount) {
 		globalPool = AmasDescriptorPool::Builder(amasDevice)
-			.setMaxSets(100)
+			.setMaxSets(1000)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AmasSwapChain::MAX_FRAMES_IN_FLIGHT)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AmasSwapChain::MAX_FRAMES_IN_FLIGHT * texturesCount)
 			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, materialObjectsCount)
@@ -101,7 +101,7 @@ namespace amas {
 		for (int i = 0; i < globalSets.size(); i++) {
 			auto bufferInfo = globalBuffers[i]->descriptorInfo();
 			writer1.writeBuffer(0, &bufferInfo);
-			for (int j = 0; j < getMaterialHavingObjectsCount(); j++) {
+			for (int j = 0; j < textures.size(); j++) {
 				//need to implement a predicate for map 
 				writer1.writeImage(j + 1, &gameObjects.at(j).material->info);
 			}
@@ -116,7 +116,6 @@ namespace amas {
 			writer2.build(componentSets[i]);
 		}
 	}
-
 
 	void App::run() {
 		initDescriptorLayouts();
@@ -133,8 +132,6 @@ namespace amas {
 			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-		std::cout << getMaterialHavingObjectsCount() << std::endl;
-
 		for (int i = 0; i < componentUboBuffers.size(); i++) {
 			componentUboBuffers[i]->writeToBuffer(&gameObjects.at(i).gameObjectUBO);
 			componentUboBuffers[i]->flush();
@@ -144,8 +141,6 @@ namespace amas {
 		std::vector<VkDescriptorSet> componentSets(getMaterialHavingObjectsCount());
 
 		initDescriptorSets(globalDescriptorSets, uboBuffers, componentSets, componentUboBuffers);
-
-
 
 		SimpleRenderSystem simpleRenderSystem{ amasDevice, AmasRenderer.getSwapChainRenderPass(), descriptorSetLayouts };
 		PointLightSystem pointLightSystem{ amasDevice, AmasRenderer.getSwapChainRenderPass(), descriptorSetLayouts[0]->getDescriptorSetLayout()};
@@ -196,6 +191,7 @@ namespace amas {
 
 				simpleRenderSystem.renderGameObjects(frameInfo, componentSets, componentUboBuffers);
 				pointLightSystem.render(frameInfo);
+				//skybox render should be here
 
 				AmasRenderer.endSwapChainRenderPass(commandBuffer);
 				AmasRenderer.endFrame();
@@ -208,45 +204,40 @@ namespace amas {
 	void App::loadGameObjects() {
 		AmasGameObject::setDevice(amasDevice);
 
-		std::shared_ptr<AmasTexture> texture1 = std::make_shared<AmasTexture>(amasDevice, "C:/Users/arman/source/repos/VulkanFirstProj/VulkanFirstProj/3d/metal.png");
+		std::shared_ptr<AmasTexture> texture1 = std::make_shared<AmasTexture>(amasDevice, "3d/rock_wall_11_diff_4k.jpg");
 		textures.push_back(texture1);
-		std::shared_ptr<AmasTexture> texture2 = std::make_shared<AmasTexture>(amasDevice, "C:/Users/arman/source/repos/VulkanFirstProj/VulkanFirstProj/3d/wood.png");
+		std::shared_ptr<AmasTexture> texture2 = std::make_shared<AmasTexture>(amasDevice, "3d/wood.png");
 		textures.push_back(texture2);
 
-		std::shared_ptr<AmasModel> cubeModel =
-			AmasModel::createModelFromFile(amasDevice, "C:/Users/arman/source/repos/VulkanFirstProj/VulkanFirstProj/3d/cube.obj");
+		std::shared_ptr<AmasModel> quadModel =
+			AmasModel::createModelFromFile(amasDevice, "3d/quad.obj");
 
-		auto cube1 = AmasGameObject::createGameObject();
-		cube1.model = cubeModel;
-		cube1.transform.translation = { -.5f, .5f, 0 };
-		cube1.transform.scale = { 1.f, 1.f, 1.f };
-		cube1.attachMaterial(texture1);
-		gameObjects.emplace(cube1.getId(), std::move(cube1));
+		const int numQuadsPerRow = 5;
+		const float quadSpacing = 2.0f;
+		const float squareSize = numQuadsPerRow * quadSpacing;
 
-		auto cube2 = AmasGameObject::createGameObject();
-		cube2.model = cubeModel;
-		cube2.transform.translation = { 2.f, .5f, 0 };
-		cube2.transform.scale = { 1.f, 1.f, 1.f };
-		cube2.attachMaterial(texture2);
-		gameObjects.emplace(cube2.getId(), std::move(cube2));
+		for (int i = 0; i < numQuadsPerRow; i++) {
+			for (int j = 0; j < numQuadsPerRow; j++) {
+				auto quad = AmasGameObject::createGameObject();
+				quad.model = quadModel;
+				quad.transform.translation = { i * quadSpacing - squareSize / 2.0f, 0.0f, j * quadSpacing - squareSize / 2.0f };
+				quad.transform.scale = { 1.0f, 1.0f, 1.0f };
+				quad.attachMaterial(texture1);
+				gameObjects.emplace(quad.getId(), std::move(quad));
+			}
+		}
 
-		//point lights creation
-		{
-			auto pointLight1 = AmasGameObject::makePointLight(2.f);
-			pointLight1.color = glm::vec3(.4f, .7f, .3f);
-			pointLight1.pointLight->lightIntensity = .3f;
-			pointLight1.transform.translation += glm::vec3(4.f, -.7f, -.3f);
-			gameObjects.emplace(pointLight1.getId(), std::move(pointLight1));
-			auto pointLight2 = AmasGameObject::makePointLight(1.f);
-			pointLight2.pointLight->lightIntensity = 1.5f;
-			pointLight2.color = glm::vec3(.5f, .2f, .8f);
-			pointLight2.transform.translation += glm::vec3(-1.2f, -1.3f, .5f);
-			gameObjects.emplace(pointLight2.getId(), std::move(pointLight2));
-			auto pointLight3 = AmasGameObject::makePointLight(.5f);
-			pointLight3.pointLight->lightIntensity = .5f;
-			pointLight3.color = glm::vec3(.2f, .5f, .5f);
-			pointLight3.transform.translation += glm::vec3(1.8f, -1.7f, -.7f);
-			gameObjects.emplace(pointLight3.getId(), std::move(pointLight3));
+		const int numPointLights = 4;
+		const float pointLightSpacing = squareSize / (numPointLights + 1);
+
+		for (int i = 0; i < numPointLights; i++) {
+			for (int j = 0; j < numPointLights; j++) {
+				auto pointLight = AmasGameObject::makePointLight(1.2f);
+				pointLight.color = glm::vec3(1.f, 1.f, 1.f);
+				pointLight.pointLight->lightIntensity = .7f;
+				pointLight.transform.translation += glm::vec3((i + 1) * pointLightSpacing - squareSize / 2.0f, -3.0f, (j + 1) * pointLightSpacing - squareSize / 2.0f);
+				gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+			}
 		}
 
 		std::cout << "GameObjects overall count:  " << gameObjects.size() << "\n";

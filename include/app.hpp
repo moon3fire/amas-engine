@@ -14,8 +14,8 @@ namespace amas {
 
 	class App {
 	public:
-		static constexpr int WIDTH = 800;
-		static constexpr int HEIGHT = 600;
+		static constexpr int WIDTH = 1200;
+		static constexpr int HEIGHT = 800;
 
 		App();
 		~App();
@@ -42,7 +42,7 @@ namespace amas {
 	private:
 		void loadGameObjects();
 
-		AmasWindow amasWindow{ WIDTH, HEIGHT, "Vulkan Tutorial" };
+		AmasWindow amasWindow{ WIDTH, HEIGHT, "Amas engine v1.0.0" };
 		AmasDevice amasDevice{ amasWindow };
 		AmasRenderer AmasRenderer{ amasWindow, amasDevice };
 

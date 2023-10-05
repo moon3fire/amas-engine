@@ -1,5 +1,5 @@
 #include "../include/keyboard_movement_controller.hpp"
-
+#include <iostream>
 // std
 #include <limits>
 
@@ -40,4 +40,7 @@ namespace amas {
 			gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
 		}
 	}
+
+
+
 }  // namespace amas
