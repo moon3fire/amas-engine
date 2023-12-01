@@ -1,7 +1,7 @@
-# Vulkan-engine
-GPU rendering engine by me
+# amas-engine
+GPU rendering engine by me using Vulkan SDK
 Needed libraries to make program to work:
 Vulkan SDK
 glm
 glfw
-(some of the resources are included into this repo)
+This project development is currently in unactive phase.
