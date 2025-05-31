@@ -22,13 +22,7 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     int activeLightsCount;
 } ubo;
 
-layout (set = 0, binding = 1) uniform sampler2D image1;
-layout (set = 0, binding = 2) uniform sampler2D image2;
-
-layout(set = 1, binding = 0) uniform ComponentUbo {
-    int currentGameObjectID;
-} componentUbo;
-
+layout (set = 0, binding = 1) uniform sampler2D image;
 
 layout (push_constant) uniform Push {
 	mat4 modelMatrix;
@@ -62,12 +56,7 @@ void main() {
 		specularLight += intensity * blinnTerm;
 	}
 
-	vec3 imageColor;
-	if (componentUbo.currentGameObjectID == 0) {
-		imageColor = texture(image1, fragUV).rgb;
-	} else if (componentUbo.currentGameObjectID == 1) {
-		imageColor = texture(image2, fragUV).rgb;
-	}
+	vec3 imageColor = texture(image, fragUV).rgb;
 
 	outColor = vec4((diffuseLight * fragColor + specularLight * fragColor) * imageColor, 1.0);
 }

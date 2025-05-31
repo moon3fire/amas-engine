@@ -21,13 +21,9 @@ layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 view;
     mat4 inverseView;
     vec4 ambientLightColor; // w is intensity
-    PointLight pointLights[1000];
+    PointLight pointLights[10];
     int activeLightsCount;
 } ubo;
-
-layout(set = 1, binding = 0) uniform ComponentUbo {
-    int currentGameObjectID;
-} componentUbo;
 
 layout (push_constant) uniform Push {
     vec4 position;
